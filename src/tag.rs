@@ -410,13 +410,15 @@ impl<'a> Tag {
     }
 
     /// Attempts to read a FLAC tag from the reader.
-    pub fn read_from(reader: &mut dyn Read) -> Result<Tag> {
+    pub fn read_from(reader: &mut dyn Read, types: Option<&[BlockType]>) -> Result<Tag> {
         let mut tag = Tag::new();
 
-        for result in Blocks::new(reader) {
+        for result in Blocks::new(reader, types) {
             let (length, block) = result?;
             tag.length += length;
-            tag.blocks.push(block);
+            if let Some(block) = block {
+                tag.blocks.push(block);
+            }
         }
 
         Ok(tag)
@@ -511,10 +513,10 @@ impl<'a> Tag {
     }
 
     /// Attempts to read a FLAC tag from the file at the specified path.
-    pub fn read_from_path<P: AsRef<Path>>(path: P) -> Result<Tag> {
+    pub fn read_from_path<P: AsRef<Path>>(path: P, types: Option<&[BlockType]>) -> Result<Tag> {
         let file = File::open(&path)?;
         let mut reader = BufReader::new(file);
-        let mut tag = Tag::read_from(&mut reader)?;
+        let mut tag = Tag::read_from(&mut reader, types)?;
         tag.path = Some(path.as_ref().to_path_buf());
         Ok(tag)
     }

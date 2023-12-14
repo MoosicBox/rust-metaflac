@@ -76,6 +76,42 @@ pub enum Block {
 impl Block {
     /// Attempts to read a block from the reader. Returns a tuple containing a boolean indicating
     /// if the block was the last block, the length of the block in bytes, and the new `Block`.
+    pub fn read_from_only(
+        reader: &mut dyn Read,
+        types: &[BlockType],
+    ) -> Result<(bool, u32, Option<Block>)> {
+        let byte = reader.read_u8()?;
+        let is_last = (byte & 0x80) != 0;
+        let blocktype_byte = byte & 0x7F;
+        let blocktype = BlockType::from_u8(blocktype_byte);
+        let length = reader.read_uint::<BE>(3)? as u32;
+
+        debug!("Reading block {:?} with {} bytes", blocktype, length);
+
+        let mut data = Vec::new();
+        reader.take(length as u64).read_to_end(&mut data).unwrap();
+        if !types.iter().any(|t| *t == blocktype) {
+            return Ok((is_last, length + 4, None));
+        }
+
+        let block = match blocktype {
+            BlockType::StreamInfo => Block::StreamInfo(StreamInfo::from_bytes(&data[..])),
+            BlockType::Padding => Block::Padding(length),
+            BlockType::Application => Block::Application(Application::from_bytes(&data[..])),
+            BlockType::SeekTable => Block::SeekTable(SeekTable::from_bytes(&data[..])),
+            BlockType::VorbisComment => Block::VorbisComment(VorbisComment::from_bytes(&data[..])?),
+            BlockType::Picture => Block::Picture(Picture::from_bytes(&data[..])?),
+            BlockType::CueSheet => Block::CueSheet(CueSheet::from_bytes(&data[..])?),
+            BlockType::Unknown(_) => Block::Unknown((blocktype_byte, data)),
+        };
+
+        debug!("{:?}", block);
+
+        Ok((is_last, length + 4, Some(block)))
+    }
+
+    /// Attempts to read a block from the reader. Returns a tuple containing a boolean indicating
+    /// if the block was the last block, the length of the block in bytes, and the new `Block`.
     pub fn read_from(reader: &mut dyn Read) -> Result<(bool, u32, Block)> {
         let byte = reader.read_u8()?;
         let is_last = (byte & 0x80) != 0;
@@ -1175,6 +1211,7 @@ pub struct Blocks<R> {
     ident_read: bool,
     finished: bool,
     reader: R,
+    types: Option<Vec<BlockType>>,
 }
 
 impl<R> Blocks<R>
@@ -1182,11 +1219,12 @@ where
     R: Read,
 {
     /// Create new iterator over FLAC stream's blocks
-    pub fn new(reader: R) -> Self {
+    pub fn new(reader: R, types: Option<&[BlockType]>) -> Self {
         Blocks {
             ident_read: false,
             finished: false,
             reader,
+            types: types.map(|t| t.to_vec()),
         }
     }
 }
@@ -1196,7 +1234,7 @@ where
     R: Read,
 {
     /// block length and block pairs
-    type Item = Result<(u32, Block)>;
+    type Item = Result<(u32, Option<Block>)>;
 
     fn next(&mut self) -> Option<Self::Item> {
         if !self.ident_read {
@@ -1208,14 +1246,18 @@ where
         }
 
         if !self.finished {
-            match Block::read_from(&mut self.reader) {
+            match if let Some(types) = &self.types {
+                Block::read_from_only(&mut self.reader, types)
+            } else {
+                Block::read_from(&mut self.reader).map(|(a, b, c)| (a, b, Some(c)))
+            } {
                 Ok((is_last, length, block)) => {
                     self.finished = is_last;
-                    Some(Ok((length, block)))
+                    return Some(Ok((length, block)));
                 }
                 Err(err) => {
                     self.finished = true;
-                    Some(Err(err))
+                    return Some(Err(err));
                 }
             }
         } else {
