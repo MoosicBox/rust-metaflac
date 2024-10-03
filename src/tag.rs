@@ -53,7 +53,7 @@ impl<'a> Tag {
     ///
     /// # Example
     /// ```
-    /// use metaflac::{Tag, Block, BlockType};
+    /// use moosicbox_metaflac::{Tag, Block, BlockType};
     ///
     /// let mut tag = Tag::new();
     /// tag.push_block(Block::Padding(10));
@@ -72,7 +72,7 @@ impl<'a> Tag {
     ///
     /// # Example
     /// ```
-    /// use metaflac::Tag;
+    /// use moosicbox_metaflac::Tag;
     ///
     /// let mut tag = Tag::new();
     /// assert!(tag.vorbis_comments().is_none());
@@ -95,7 +95,7 @@ impl<'a> Tag {
     ///
     /// # Example
     /// ```
-    /// use metaflac::Tag;
+    /// use moosicbox_metaflac::Tag;
     ///
     /// let mut tag = Tag::new();
     /// assert!(tag.vorbis_comments().is_none());
@@ -129,7 +129,7 @@ impl<'a> Tag {
     ///
     /// # Example
     /// ```
-    /// use metaflac::Tag;
+    /// use moosicbox_metaflac::Tag;
     ///
     /// let mut tag = Tag::new();
     ///
@@ -151,7 +151,7 @@ impl<'a> Tag {
     ///
     /// # Example
     /// ```
-    /// use metaflac::Tag;
+    /// use moosicbox_metaflac::Tag;
     ///
     /// let mut tag = Tag::new();
     ///
@@ -172,7 +172,7 @@ impl<'a> Tag {
     ///
     /// # Example
     /// ```
-    /// use metaflac::Tag;
+    /// use moosicbox_metaflac::Tag;
     ///
     /// let mut tag = Tag::new();
     ///
@@ -196,7 +196,7 @@ impl<'a> Tag {
     ///
     /// # Example
     /// ```
-    /// use metaflac::Tag;
+    /// use moosicbox_metaflac::Tag;
     ///
     /// let mut tag = Tag::new();
     ///
@@ -219,8 +219,8 @@ impl<'a> Tag {
     ///
     /// # Example
     /// ```
-    /// use metaflac::Tag;
-    /// use metaflac::block::PictureType::CoverFront;
+    /// use moosicbox_metaflac::Tag;
+    /// use moosicbox_metaflac::block::PictureType::CoverFront;
     ///
     /// let mut tag = Tag::new();
     /// assert_eq!(tag.pictures().count(), 0);
@@ -238,8 +238,8 @@ impl<'a> Tag {
     ///
     /// # Example
     /// ```
-    /// use metaflac::Tag;
-    /// use metaflac::block::PictureType::CoverFront;
+    /// use moosicbox_metaflac::Tag;
+    /// use moosicbox_metaflac::block::PictureType::CoverFront;
     ///
     /// let mut tag = Tag::new();
     /// assert_eq!(tag.pictures().count(), 0);
@@ -271,8 +271,8 @@ impl<'a> Tag {
     ///
     /// # Example
     /// ```
-    /// use metaflac::Tag;
-    /// use metaflac::block::PictureType::{CoverFront, Other};
+    /// use moosicbox_metaflac::Tag;
+    /// use moosicbox_metaflac::block::PictureType::{CoverFront, Other};
     ///
     /// let mut tag = Tag::new();
     /// assert_eq!(tag.pictures().count(), 0);
@@ -301,8 +301,8 @@ impl<'a> Tag {
     ///
     /// # Example
     /// ```
-    /// use metaflac::Tag;
-    /// use metaflac::block::StreamInfo;
+    /// use moosicbox_metaflac::Tag;
+    /// use moosicbox_metaflac::block::StreamInfo;
     ///
     /// let mut tag = Tag::new();
     /// assert!(tag.get_streaminfo().is_none());
@@ -323,8 +323,8 @@ impl<'a> Tag {
     ///
     /// # Example
     /// ```
-    /// use metaflac::Tag;
-    /// use metaflac::block::StreamInfo;
+    /// use moosicbox_metaflac::Tag;
+    /// use moosicbox_metaflac::block::StreamInfo;
     ///
     /// let mut tag = Tag::new();
     /// tag.set_streaminfo(StreamInfo::new());

@@ -1,5 +1,5 @@
 [package]
-name = "metaflac"
+name = "moosicbox_metaflac"
 version = "0.1.0"
 authors = ["James Hurst <james@jameshurst.ca>", "Braden Steffaniak"]
 license = "MIT"
